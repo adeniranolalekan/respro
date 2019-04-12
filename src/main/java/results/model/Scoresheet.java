@@ -19,15 +19,17 @@ public class Scoresheet {
     @JoinColumn(name = "studentId",nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Student student;
-    private Long fca1;
-    private Long fca2;
-    private Long fca3;
-    private Long fExam;
-    private Long fTotal;
-    private Long fPosition;
+    private double fca1;
+    private double fca2;
+    private double fca3;
+    private double fExam;
+    private double fTotal;
+    private int fPosition;
     private String fGrade;
     private String fRemark;
-    private Long cumAvg;
-    private Long position;
+    private double cumAvg;
+    private int position;
+    private double sTotal;
+    private double tTotal;
 
 }

@@ -12,7 +12,7 @@ public class Student {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long studentId;
     private double fTotal;
-    private double fPosition;
+    private int fPosition;
     private String name;
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "armId",nullable = false)
