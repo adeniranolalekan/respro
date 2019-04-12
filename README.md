@@ -1,7 +1,7 @@
 # respro 
 A School Result Processing App
 
-This Repository is created with JAVA SPRING FRAMEWORK, 
+This Repository is a Restful API created with JAVA SPRING FRAMEWORK, 
 
  RESPRO helps School admin, Class Teachers and Subject Teacher to collaborate seamlessly in
  on the computation of result
