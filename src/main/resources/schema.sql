@@ -8,6 +8,14 @@ create table if not exists ClassArm(
 
     armname varchar(20) not null ;
 );
+create table if not exists ResultClass_ClassArm (
+resultClass string not null,
+classArm int not null
+);
+alter table ResultClass_ClassArm
+add foreign key (resultClass) references ResultClass(classname);
+alter table ResultClass_ClassArm
+add foreign key (classArm) references ClassArm(armId);
 create table if not exists Affective(
 aid int identity ,
      fPunctuality int not null,
@@ -50,9 +58,33 @@ aid int identity ,
     tPerseverance int not null,
     tSpeaking int not null
 );
+create table if not exists Student_Affective (
+student int not null,
+affective int not null
+);
+alter table Student_Affective
+add foreign key (student) references Student(studentId);
+alter table Student_Affective
+add foreign key (affective) references Affective(aid);
 create table if not exists ClassTeacher(
 classTeacherId int identity
 );
+create table if not exists User_ClassTeacher(
+user int not null,
+classTeacher int not null
+);
+alter table User_ClassTeacher
+add foreign key (user) references User(userId);
+alter table User_ClassTeacher
+add foreign key (classTeacher) references ClassTeacher(classTeacherId);
+create table if not exists ClassArm_ClassTeacher(
+classArm int not null,
+classTeacher int not null
+);
+alter table ClassArm_ClassTeacher
+add foreign key (classArm) references User(armId);
+alter table ClassArm_ClassTeacher
+add foreign key (classTeacher) references ClassTeacher(classTeacherId);
 create table if not exists Grade(
 gradeId int identity,
    rangeLow int not null,
@@ -90,6 +122,14 @@ create table if not exists Psychomotor(
    tDrawPaint int not null,
     tSocialSkills int not null
 );
+create table if not exists Student_Psychomotor (
+student int not null,
+psychomotor int not null
+);
+alter table Student_Psychomotor
+add foreign key (student) references Student(studentId);
+alter table Student_Psychomotor
+add foreign key (psychomotor) references Psychomotor(pid);
 create table if not exists Scoresheet(
  private Long sheetId int identity,
 
@@ -121,6 +161,22 @@ create table if not exists Scoresheet(
     tRemark varchar(100) not null
 
 );
+create table if not exists Student_Scoresheet (
+student int not null,
+scoresheet int not null
+);
+alter table Student_Scoresheet
+add foreign key (student) references Student(studentId);
+alter table Student_Scoresheet
+add foreign key (scoresheet) references Scoresheet(scoresheetId);
+create table if not exists Subject_Scoresheet (
+subject int not null,
+scoresheet int not null
+);
+alter table Subject_Scoresheet
+add foreign key (subject) references Subject(subjectId);
+alter table Subject_Scoresheet
+add foreign key (scoresheet) references Scoresheet(scoresheetId);
 create table if not exists Setting(
  private Long settingId int identity,
     Term int not null,
@@ -166,16 +222,41 @@ create table if not exists Student(
    tAttendance int not null;
 
      noOfSubjectOffered int not null;
-);create table if not exists Subject(
+);
+create table if not exists ClassArm_Student (
+classArm int not null,
+student int not null
+);
+alter table ClassArm_Student
+add foreign key (classArm) references ClassArm(armId);
+alter table ClassArm_Student
+add foreign key (student) references Student(studentId);
+create table if not exists Subject(
  subjectId int identity ,
     subjectName varchar (50) not null,
     fClassAvg float not null,
     sClassAvg float not null,
     tClassAvg float not null
 );
+create table if not exists ClassArm_Subject (
+classArm int not null,
+subject int not null
+);
+alter table ClassArm_Subject
+add foreign key (classArm) references ClassArm(armId);
+alter table ClassArm_Subject
+add foreign key (subject) references Student(subjectId);
 create table if not exists SubjectTeacher(
 subjectTeacherId int identity
 );
+create table if not exists User_SubjectTeacher(
+user int not null,
+subjectTeacher int not null
+);
+alter table User_SubjectTeacher
+add foreign key (user) references User(userId);
+alter table User_SubjectTeacher
+add foreign key (subjectTeacher) references SubjectTeacher(subjectTeacherId);
 create table if not exists TComment(
   tCommentId int identity ,
     rangeLow int not null,
