@@ -27,5 +27,17 @@ public class Student {
     private  String fPrincipalComment;
     private double fPercentage;
     private  int fAttendance;
+    private double sTotal;
+    private int sPosition;
+    private String sTeacherComment;
+    private  String sPrincipalComment;
+    private double sPercentage;
+    private  int sAttendance;
+    private double tTotal;
+    private int tPosition;
+    private String tTeacherComment;
+    private  String tPrincipalComment;
+    private double tPercentage;
+    private  int tAttendance;
     private int noOfSubjectOffered;
 }

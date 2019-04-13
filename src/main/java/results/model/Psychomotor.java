@@ -21,5 +21,19 @@ public class Psychomotor {
     private Long fHandlingTools;
     private Long fDrawPaint;
     private Long fSocialSkills;
+    private Long sHandwriting;
+    private Long sVFluency;
+    private Long sGames;
+    private Long sSports;
+    private Long sHandlingTools;
+    private Long sDrawPaint;
+    private Long sSocialSkills;
+    private Long tHandwriting;
+    private Long tVFluency;
+    private Long tGames;
+    private Long tSports;
+    private Long tHandlingTools;
+    private Long tDrawPaint;
+    private Long tSocialSkills;
 
 }

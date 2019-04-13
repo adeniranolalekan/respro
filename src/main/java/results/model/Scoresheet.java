@@ -29,7 +29,20 @@ public class Scoresheet {
     private String fRemark;
     private double cumAvg;
     private int position;
+    private double sca1;
+    private double sca2;
+    private double sca3;
+    private double sExam;
     private double sTotal;
+    private int sPosition;
+    private String sGrade;
+    private String sRemark;
+    private double tca1;
+    private double tca2;
+    private double tca3;
+    private double tExam;
     private double tTotal;
+    private String tGrade;
+    private String tRemark;
 
 }

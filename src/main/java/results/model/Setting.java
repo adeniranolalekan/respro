@@ -1,12 +1,21 @@
 package results.model;
 
 import lombok.Data;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 @Data
 @Entity
 public class Setting {
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Long settingId;
     private Long Term;
+    @Type(type="org.hibernate.type.NumericBooleanType")
     private boolean resultApproved;
     private boolean currentSession;
     private boolean serverLock;

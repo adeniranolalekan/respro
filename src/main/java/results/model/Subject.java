@@ -18,4 +18,6 @@ public class Subject {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ClassArm classArm;
     private double fClassAvg;
+    private double sClassAvg;
+    private double tClassAvg;
 }
