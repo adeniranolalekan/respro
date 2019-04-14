@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ResultService {
 
-     void updateScoresheet(Long subjectId, String ArmId);
+     void updateScoresheet(int subjectId, String ArmId);
      void updateStudentPosition(ArrayList<Long> primaryKey, ArrayList<Double> value);
      void updateSubjectPosition(ArrayList<Long> primaryKey, ArrayList<Double> value);
     int findMax(ArrayList<Double> inList);

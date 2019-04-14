@@ -14,6 +14,7 @@ import results.repository.StudentRepository;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class ScoresheetController {
     @Autowired
@@ -31,17 +32,17 @@ public class ScoresheetController {
 
     @PostMapping("/scoresheets")
     public void createScoresheet(@Valid @RequestBody Scoresheet[] scoresheets) {
-        ArrayList<Long> SubjectIds = new ArrayList<Long>();
+        ArrayList<Integer> SubjectIds = new ArrayList<Integer>();
         ArrayList<Long> students = new ArrayList<Long>();
         Long inArmId = scoresheets[0].getStudent().getClassArm().getArmId();
         for (Scoresheet scoresheet : scoresheets) {
             if (!SubjectIds.contains(scoresheet.getSubject().getSubjectId()))
-                SubjectIds.add((long) scoresheet.getSubject().getSubjectId());
+                SubjectIds.add(scoresheet.getSubject().getSubjectId());
             students.add(scoresheet.getStudent().getStudentId());
             scoresheetRepository.save(scoresheet);
         }
         resultService.updateStudentOfferedSubject(students.toArray(), true);
-        for (long id : SubjectIds) {
+        for (int id : SubjectIds) {
             resultService.updateScoresheet(id, inArmId.toString());
         }
 
@@ -49,34 +50,43 @@ public class ScoresheetController {
     }
 
     @PutMapping("/scoresheets/{scoresheetId}")
-    public Scoresheet updateScoresheet(@PathVariable Long scoresheetId, @Valid @RequestBody Scoresheet postRequest) {
-        return scoresheetRepository.findById(scoresheetId).map(scoresheet -> {
+    public Scoresheet[] updateScoresheet(@PathVariable Long scoresheetId, @Valid @RequestBody Scoresheet[] postRequest) {
+        Scoresheet currentScoresheet;
+        ArrayList<Scoresheet> returnValue= new ArrayList<Scoresheet>();
+        for (Scoresheet scoresheet : postRequest) {
             double currentTotal;
             double previousTotal;
-            currentTotal = postRequest.getFca1() + postRequest.getFca2() + postRequest.getFca3() + postRequest.getFExam();
-            previousTotal = scoresheet.getFTotal();
-            scoresheet.setFTotal(postRequest.getFTotal());
-            scoresheet.setFPosition(postRequest.getFPosition());
-            scoresheet.setFca1(postRequest.getFca1());
-            scoresheet.setFca2(postRequest.getFca2());
-            scoresheet.setFca3(postRequest.getFca3());
-            scoresheet.setFExam(postRequest.getFExam());
-            scoresheet.setFTotal(currentTotal);
-            scoresheet.setCumAvg((postRequest.getSTotal() + postRequest.getTTotal() + currentTotal) / 3);
-            scoresheet.setPosition(postRequest.getPosition());
-            scoresheet.setFGrade(postRequest.getFGrade());
-            scoresheet.setFRemark(postRequest.getFRemark());
 
-            Student thisStudent = postRequest.getStudent();
+            currentScoresheet = scoresheetRepository.findById(scoresheet.getSheetId()).get();
+            currentTotal = scoresheet.getFca1() + scoresheet.getFca2() + scoresheet.getFca3() + scoresheet.getFExam();
+            previousTotal = currentScoresheet.getFTotal();
+            scoresheet.setFTotal(scoresheet.getFTotal());
+            scoresheet.setFPosition(scoresheet.getFPosition());
+            scoresheet.setFca1(scoresheet.getFca1());
+            scoresheet.setFca2(scoresheet.getFca2());
+            scoresheet.setFca3(scoresheet.getFca3());
+            scoresheet.setFExam(scoresheet.getFExam());
+            scoresheet.setFTotal(currentTotal);
+            scoresheet.setCumAvg((scoresheet.getSTotal() + scoresheet.getTTotal() + currentTotal) / 3);
+            scoresheet.setPosition(scoresheet.getPosition());
+            scoresheet.setFGrade(scoresheet.getFGrade());
+            scoresheet.setFRemark(scoresheet.getFRemark());
+
+            Student thisStudent = scoresheet.getStudent();
             thisStudent.setFTotal(thisStudent.getFTotal() - previousTotal + currentTotal);
-            resultService.updateScoresheet(thisStudent.getStudentId(), thisStudent.getClassArm().getArmId().toString());
             resultService.gradeStudent(postRequest);
             studentRepository.save(thisStudent);
-            return scoresheetRepository.save(scoresheet);
+            returnValue.add(scoresheet);
+            scoresheetRepository.save(scoresheet);
 
 
-        }).orElseThrow(() -> new ResourceNotFoundException("ScoresheetId" + scoresheetId + "not found"));
+        }
+        resultService.updateScoresheet(postRequest[0].getSubject().getSubjectId(), postRequest[0].getStudent().getClassArm().getArmId().toString());
+        resultService.gradeStudent(postRequest);
+        return (Scoresheet[]) returnValue.toArray();
     }
+
+
 
     @DeleteMapping("/scoresheets/{scoresheetId}")
     public ResponseEntity<?> deleteScoresheet(@PathVariable Long[] scoresheets) {

@@ -12,5 +12,5 @@ import results.model.Subject;
 public interface ScoresheetRepository extends CrudRepository<Scoresheet, Long> {
     Page<Scoresheet> findAll(Pageable pageable);
     @Query("FROM Scoresheet g where g.subject.subjectId= :subjectId")
-    Iterable<Scoresheet> findAllBySubject(@Param("subjectId") Long subjectId);
+    Iterable<Scoresheet> findAllBySubject(@Param("subjectId") int subjectId);
 }

@@ -19,6 +19,8 @@ public class Setting {
     private boolean resultApproved;
     private boolean currentSession;
     private boolean serverLock;
+    private boolean secondCAEnabled;
+    private boolean thirdCAEnabled;
     private String session;
     private String firstResumptionDate;
     private String secongResumptionDate;

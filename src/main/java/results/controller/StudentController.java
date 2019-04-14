@@ -70,7 +70,7 @@ public class StudentController {
     public ResponseEntity<?> deleteStudent(@PathVariable Long studentId){
         return studentRepository.findById(studentId).map(student -> {
             subjectRepository.findAllByClassArm(student.getClassArm().getArmId()).forEach(i-> {
-              resultService.updateScoresheet((long)i.getSubjectId(), student.getClassArm().getArmId().toString());
+              resultService.updateScoresheet(i.getSubjectId(), student.getClassArm().getArmId().toString());
             });
 
              studentRepository.delete(student);

@@ -2,10 +2,7 @@ package results;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import results.model.Grade;
-import results.model.Scoresheet;
-import results.model.Student;
-import results.model.Subject;
+import results.model.*;
 import results.repository.*;
 
 import java.text.DecimalFormat;
@@ -30,7 +27,7 @@ public class ResultServiceImpl implements ResultService {
     @Autowired
     private GradeRepository gradeRepository;
     @Override
-   public void updateScoresheet(Long subjectId, String ArmId){
+   public void updateScoresheet(int subjectId, String ArmId){
         ArrayList<Double> totalValue = new ArrayList<Double>();
         ArrayList<Long> totalPrimaryKey = new ArrayList<Long>();
         ArrayList<Double> totalValue2 = new ArrayList<Double>();
@@ -264,6 +261,50 @@ public class ResultServiceImpl implements ResultService {
     }
     @Override
     public void UpdateCAs(){
-        //Method to be implemented in the next commit
+
+        Setting settings =settingRepository.findById(1).get();
+        Iterable<Scoresheet> scoresheets=scoresheetRepository.findAll();
+        Iterable<Subject> subjects=subjectRepository.findAll();
+        int term = settings.getTerm();
+        if (!settings.isThirdCAEnabled() && !settings.isSecondCAEnabled())
+        {
+            if (term == 1)
+            {
+                for (Scoresheet scoresheet:scoresheets)
+                {
+                    scoresheet.setFca2(0);
+                    scoresheet.setFca3(0);
+                    scoresheet.setFTotal(scoresheet.getFca1());
+                    scoresheetRepository.save(scoresheet);
+
+
+                }
+            }
+            else if (term == 2)
+            {
+                for (Scoresheet scoresheet:scoresheets)
+                {
+                    scoresheet.setSca2(0);
+                    scoresheet.setSca3(0);
+                    scoresheet.setSTotal(scoresheet.getSca1());
+                    scoresheetRepository.save(scoresheet);
+
+
+                }
+            }
+            else
+                for (Scoresheet scoresheet:scoresheets)
+                {
+                    scoresheet.setTca2(0);
+                    scoresheet.setTca3(0);
+                    scoresheet.setTTotal(scoresheet.getTca1());
+                    scoresheetRepository.save(scoresheet);
+
+
+                }
+            for (Subject subject:subjects)
+            updateScoresheet( subject.getSubjectId(), subject.getClassArm().getArmId().toString());
+
+        }
     }
 }

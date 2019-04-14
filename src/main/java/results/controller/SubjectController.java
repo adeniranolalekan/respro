@@ -54,7 +54,7 @@ public class SubjectController {
     }
 
     @PutMapping("/subjects/{subjectId}")
-    public Subject updateSubject(@PathVariable Long subjectId, @Valid @RequestBody Subject postRequest){
+    public Subject updateSubject(@PathVariable int subjectId, @Valid @RequestBody Subject postRequest){
         return subjectRepository.findById(subjectId).map(subject -> {
             subject.setSubjectName(postRequest.getSubjectName());
             subject.setFClassAvg(postRequest.getFClassAvg());
@@ -62,7 +62,7 @@ public class SubjectController {
         }).orElseThrow(()->new ResourceNotFoundException("SubjectId" + subjectId+"not found"));
     }
     @DeleteMapping("/subjects/{subjectId}")
-    public ResponseEntity<?> deleteSubject(@PathVariable Long subjectId){
+    public ResponseEntity<?> deleteSubject(@PathVariable int subjectId){
         return subjectRepository.findById(subjectId).map(subject -> {
             ArrayList<Object> students=new ArrayList<Object>();
               scoresheetRepository.findAllBySubject(subjectId).forEach(i->{
