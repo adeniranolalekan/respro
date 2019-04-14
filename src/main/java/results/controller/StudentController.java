@@ -11,6 +11,7 @@ import results.model.*;
 import results.repository.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 
 @RestController
 public class StudentController {
@@ -33,49 +34,52 @@ public class StudentController {
      }
 
      @PostMapping("/arms/{armId}/students")
-    public Student createStudent(@PathVariable (value = "armId") Long armId,@Valid @RequestBody Student student){
-         Psychomotor psychomotor= new Psychomotor();
-         Affective affective=new Affective();
-         psychomotor.setStudent(student);
-         affective.setStudent(student);
+    public void createStudent(@PathVariable (value = "armId") Long armId,@Valid @RequestBody Student[] students){
+         for (Student student : students) {
+             Psychomotor psychomotor = new Psychomotor();
+             Affective affective = new Affective();
+             psychomotor.setStudent(student);
+             affective.setStudent(student);
 
-         ClassArm arm=classArmRepository.findById(armId).get();
+             ClassArm arm = classArmRepository.findById(armId).get();
 
              student.setClassArm(arm);
-             subjectRepository.findAllByClassArm(armId).forEach(i->{
+             subjectRepository.findAllByClassArm(armId).forEach(i -> {
                  scoresheet.setStudent(student);
                  scoresheet.setSubject(i);
                  scoresheetRepository.save(scoresheet);
-                 scoresheet=new Scoresheet();
+                 studentRepository.save(student);
+                 scoresheet = new Scoresheet();
              });
-             return studentRepository.save(student);
 
+         }
      }
 
      @PutMapping("/students/{studentId}")
-    public Student updateStudent(@PathVariable Long studentId, @Valid @RequestBody Student postRequest){
-         return studentRepository.findById(studentId).map(student -> {
-             student.setFTotal(postRequest.getFTotal());
-             student.setFPosition(postRequest.getFPosition());
-             student.setFTeacherComment(postRequest.getFTeacherComment());
-             student.setFPrincipalComment(postRequest.getFPrincipalComment());
-             student.setFPercentage(postRequest.getFPercentage());
-             student.setFAttendance(postRequest.getFAttendance());
-             student.setNoOfSubjectOffered(postRequest.getNoOfSubjectOffered());
-
-             return studentRepository.save(student);
-         }).orElseThrow(()->new ResourceNotFoundException("StudentId" + studentId+"not found"));
+    public Student[] updateStudent(@PathVariable Long studentId, @Valid @RequestBody Student[] postRequest){
+         ArrayList<Student> returnValue= new ArrayList<Student>();
+         for(Student student:postRequest)
+         {
+             studentRepository.save(student);
+        returnValue.add(student);
+     }
+         return (Student[]) returnValue.toArray();
      }
     @DeleteMapping("/students/{studentId}")
-    public ResponseEntity<?> deleteStudent(@PathVariable Long studentId){
-        return studentRepository.findById(studentId).map(student -> {
-            subjectRepository.findAllByClassArm(student.getClassArm().getArmId()).forEach(i-> {
-              resultService.updateScoresheet(i.getSubjectId(), student.getClassArm().getArmId().toString());
+    public ResponseEntity<?> deleteStudent(@PathVariable Long studentId,@RequestBody Long[] students ){
+         Student currentStudent;
+       for(Long student : students) {
+           currentStudent = studentRepository.findById(student).get();
+           studentRepository.delete(currentStudent);
+       }
+        currentStudent = studentRepository.findById(studentId).get();
+            subjectRepository.findAllByClassArm(currentStudent.getClassArm().getArmId()).forEach(i-> {
+              resultService.updateScoresheet(i.getSubjectId(), studentRepository.findById(studentId).get().getClassArm().getArmId().toString());
             });
 
-             studentRepository.delete(student);
+
              return ResponseEntity.ok().build();
-        }).orElseThrow(()->new ResourceNotFoundException("StudentId" + studentId+"not found"));
+
     }
 
 }

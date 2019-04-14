@@ -40,26 +40,34 @@ public class SubjectController {
     }
 
     @PostMapping("/arms/{armId}/subjects")
-    public Subject createSubject(@PathVariable (value = "armId") Long armId, @Valid @RequestBody Subject subject){
-        ClassArm arm=classArmRepository.findById(armId).get();
+    public Subject[] createSubject(@PathVariable (value = "armId") Long armId, @Valid @RequestBody Subject[] subjects){
+        ArrayList<Integer> armIdSubjects = new ArrayList<Integer>();
+        ArrayList<Subject> returnSubjects = new ArrayList<Subject>();
+        for (Subject subject : subjects) {
+            ClassArm arm = classArmRepository.findById(armId).get();
+            subject.setClassArm(arm);
+            armIdSubjects.add(subjectRepository.save(subject).getSubjectId());
+            returnSubjects.add(subject);
+        }
 
-        subject.setClassArm(arm);
         studentRepository.findAllByClassArm(armId).forEach(i->{
-            scoresheet.setSubject(subject);
+            for(int k :armIdSubjects)
+            scoresheet.setSubject(subjectRepository.findById(k).get());
             scoresheet.setStudent(i);
             scoresheetRepository.save(scoresheet);
             scoresheet=new Scoresheet();
         });
-        return subjectRepository.save(subject);
+        return (Subject[])returnSubjects.toArray();
     }
 
     @PutMapping("/subjects/{subjectId}")
-    public Subject updateSubject(@PathVariable int subjectId, @Valid @RequestBody Subject postRequest){
-        return subjectRepository.findById(subjectId).map(subject -> {
-            subject.setSubjectName(postRequest.getSubjectName());
-            subject.setFClassAvg(postRequest.getFClassAvg());
-            return subjectRepository.save(subject);
-        }).orElseThrow(()->new ResourceNotFoundException("SubjectId" + subjectId+"not found"));
+    public void updateSubject(@PathVariable int subjectId, @Valid @RequestBody Subject[] postRequest){
+
+       for(Subject subject:postRequest)
+       {
+
+            subjectRepository.save(subject);
+        }
     }
     @DeleteMapping("/subjects/{subjectId}")
     public ResponseEntity<?> deleteSubject(@PathVariable int subjectId){

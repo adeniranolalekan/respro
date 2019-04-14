@@ -33,21 +33,45 @@ public class ResultServiceImpl implements ResultService {
         ArrayList<Double> totalValue2 = new ArrayList<Double>();
         ArrayList<Long> totalPrimaryKey2 = new ArrayList<Long>();
         Iterable<Scoresheet> dt = scoresheetRepository.findAll();
-        //int term =settings.Term;
+        int term = settingRepository.findById(1).get().getTerm();
         double classAvg = 0.0;
         int noOfStudent = 0;
+         if(term==1) {
+             for (Scoresheet sc : dt) {
+                 if (sc.getSubject().getSubjectId() == subjectId) {
+                     totalPrimaryKey.add(sc.getSheetId());
 
-        for (Scoresheet sc : dt) {
-            if (sc.getSubject().getSubjectId() == subjectId)
-            {
-                totalPrimaryKey.add(sc.getSheetId());
+                     totalValue.add(sc.getFTotal());
+                     classAvg = classAvg + sc.getFTotal();
+                     noOfStudent++;
 
-                totalValue.add(sc.getFTotal());
-                classAvg = classAvg + sc.getFTotal();
-                noOfStudent++;
+                 }
+             }
+         }
+         else if (term==2) {
+             for (Scoresheet sc : dt) {
+                 if (sc.getSubject().getSubjectId() == subjectId) {
+                     totalPrimaryKey.add(sc.getSheetId());
 
-            }
-        }
+                     totalValue.add(sc.getSTotal());
+                     classAvg = classAvg + sc.getSTotal();
+                     noOfStudent++;
+
+                 }
+             }
+         }
+         else {
+             for (Scoresheet sc : dt) {
+                 if (sc.getSubject().getSubjectId() == subjectId) {
+                     totalPrimaryKey.add(sc.getSheetId());
+
+                     totalValue.add(sc.getTTotal());
+                     classAvg = classAvg + sc.getTTotal();
+                     noOfStudent++;
+
+                 }
+             }
+         }
         DecimalFormat df= new DecimalFormat("#.00");
         if (subjectId != 0)
         {
@@ -59,15 +83,38 @@ public class ResultServiceImpl implements ResultService {
 
         }
         Iterable<Student> dt2=studentRepository.findAll();
-
-        for(Student sc2:dt2) {
-            if (sc2.getClassArm().getArmId().toString() == ArmId) {
-                totalPrimaryKey2.add(sc2.getStudentId());
-                totalValue2.add(sc2.getFTotal());
-                sc2.setFPercentage(Double.parseDouble(df.format(sc2.getFTotal()/sc2.getNoOfSubjectOffered())));
-               studentRepository.save(sc2);
+        if(term==1) {
+            for (Student sc2 : dt2) {
+                if (sc2.getClassArm().getArmId().toString() == ArmId) {
+                    totalPrimaryKey2.add(sc2.getStudentId());
+                    totalValue2.add(sc2.getFTotal());
+                    sc2.setFPercentage(Double.parseDouble(df.format(sc2.getFTotal() / sc2.getNoOfSubjectOffered())));
+                    studentRepository.save(sc2);
+                }
             }
         }
+        else if(term==2){
+            for (Student sc2 :  dt2) {
+                if (sc2.getClassArm().getArmId().toString() == ArmId) {
+                    totalPrimaryKey2.add(sc2.getStudentId());
+                    totalValue2.add(sc2.getSTotal());
+                    sc2.setFPercentage(Double.parseDouble(df.format(sc2.getSTotal() / sc2.getNoOfSubjectOffered())));
+                    studentRepository.save(sc2);
+                }
+            }
+        }
+        else {
+            for (Student sc2 :  dt2) {
+                if (sc2.getClassArm().getArmId().toString() == ArmId) {
+                    totalPrimaryKey2.add(sc2.getStudentId());
+                    totalValue2.add(sc2.getTTotal());
+                    sc2.setFPercentage(Double.parseDouble(df.format(sc2.getTTotal() / sc2.getNoOfSubjectOffered())));
+                    studentRepository.save(sc2);
+                }
+            }
+        }
+
+
         if(subjectId!=0)  updateSubjectPosition(totalPrimaryKey, totalValue);
         updateStudentPosition(totalPrimaryKey2, totalValue2);
     }
@@ -78,10 +125,10 @@ public class ResultServiceImpl implements ResultService {
         int position = 1;
         double lastmax = 0;
         int lastposition = 1;
-       // int term =settings.Term;
+        int term = settingRepository.findById(1).get().getTerm();
         Student student;
-        // if (term == 1)
-       // {
+         if (term == 1)
+        {
             for (int i = 0; i < size; i++)
             {
 
@@ -96,7 +143,6 @@ public class ResultServiceImpl implements ResultService {
                 {
                     student.setFPosition(position);
                     lastposition = position;
-
                 }
                 position++;
                 lastmax = student.getFTotal();
@@ -107,7 +153,62 @@ public class ResultServiceImpl implements ResultService {
 
 
             }
-       // }
+       }
+         else if(term==2)
+        {
+            for (int i = 0; i < size; i++)
+            {
+
+                index1 = findMax(value);
+                student=studentRepository.findById(primaryKey.get(index1)).get();
+                if (lastmax == student.getSTotal() )
+                {
+                    student.setSPosition(lastposition);
+
+                }
+                else
+                {
+                    student.setSPosition(position);
+                    lastposition = position;
+
+                }
+                position++;
+                lastmax = student.getSTotal();
+                value.remove(index1);
+                primaryKey.remove(index1);
+                studentRepository.save(student);
+
+
+
+            }
+        }
+         else {
+             for (int i = 0; i < size; i++)
+             {
+
+                 index1 = findMax(value);
+                 student=studentRepository.findById(primaryKey.get(index1)).get();
+                 if (lastmax == student.getTTotal() )
+                 {
+                     student.setTPosition(lastposition);
+
+                 }
+                 else
+                 {
+                     student.setTPosition(position);
+                     lastposition = position;
+
+                 }
+                 position++;
+                 lastmax = student.getTTotal();
+                 value.remove(index1);
+                 primaryKey.remove(index1);
+                 studentRepository.save(student);
+
+
+
+             }
+         }
     }
     @Override
    public void updateSubjectPosition(ArrayList<Long> primaryKey, ArrayList<Double> value) {
@@ -117,30 +218,70 @@ public class ResultServiceImpl implements ResultService {
         int position = 1;
         double lastmax = 0;
         int lastposition = 1;
-        // int term =settings.Term;
+        int term = settingRepository.findById(1).get().getTerm();
         Scoresheet scoresheet;
 
-        //if (term == 1)
-        //  {
-        for (int i = 0; i < size; i++) {
-            index1 = findMax(value);
-            scoresheet = scoresheetRepository.findById(primaryKey.get(index1)).get();
+        if (term == 1) {
+            for (int i = 0; i < size; i++) {
+                index1 = findMax(value);
+                scoresheet = scoresheetRepository.findById(primaryKey.get(index1)).get();
 
-            if (lastmax == scoresheet.getFTotal()) {
-                scoresheet.setFPosition(lastposition);
+                if (lastmax == scoresheet.getFTotal()) {
+                    scoresheet.setFPosition(lastposition);
 
-            } else {
-                scoresheet.setFPosition(position);
-                lastposition = position;
+                } else {
+                    scoresheet.setFPosition(position);
+                    lastposition = position;
 
+                }
+                position++;
+                lastmax = scoresheet.getFTotal();
+                value.remove(index1);
+                primaryKey.remove(index1);
+                scoresheetRepository.save(scoresheet);
             }
-            position++;
-            lastmax = scoresheet.getFTotal();
-            value.remove(index1);
-            primaryKey.remove(index1);
-            scoresheetRepository.save(scoresheet);
         }
+        else if (term==2){
+            for (int i = 0; i < size; i++) {
+                index1 = findMax(value);
+                scoresheet = scoresheetRepository.findById(primaryKey.get(index1)).get();
 
+                if (lastmax == scoresheet.getSTotal()) {
+                    scoresheet.setSPosition(lastposition);
+
+                } else {
+                    scoresheet.setSPosition(position);
+                    lastposition = position;
+
+                }
+                position++;
+                lastmax = scoresheet.getSTotal();
+                value.remove(index1);
+                primaryKey.remove(index1);
+                scoresheetRepository.save(scoresheet);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < size; i++) {
+                index1 = findMax(value);
+                scoresheet = scoresheetRepository.findById(primaryKey.get(index1)).get();
+
+                if (lastmax == scoresheet.getTTotal()) {
+                    scoresheet.setPosition(lastposition);
+
+                } else {
+                    scoresheet.setPosition(position);
+                    lastposition = position;
+
+                }
+                position++;
+                lastmax = scoresheet.getTTotal();
+                value.remove(index1);
+                primaryKey.remove(index1);
+                scoresheetRepository.save(scoresheet);
+            }
+        }
     }
     @Override
    public int findMax(ArrayList<Double> inList){
