@@ -2,14 +2,16 @@ package results;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import results.model.Grade;
 import results.model.Scoresheet;
 import results.model.Student;
 import results.model.Subject;
-import results.repository.ScoresheetRepository;
-import results.repository.StudentRepository;
-import results.repository.SubjectRepository;
+import results.repository.*;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 @Service
@@ -22,6 +24,11 @@ public class ResultServiceImpl implements ResultService {
     private SubjectRepository subjectRepository;
     @Autowired
     private StudentRepository studentRepository;
+    @Autowired
+    private SettingRepository settingRepository;
+
+    @Autowired
+    private GradeRepository gradeRepository;
     @Override
    public void updateScoresheet(Long subjectId, String ArmId){
         ArrayList<Double> totalValue = new ArrayList<Double>();
@@ -44,10 +51,13 @@ public class ResultServiceImpl implements ResultService {
 
             }
         }
+        DecimalFormat df= new DecimalFormat("#.00");
         if (subjectId != 0)
         {
            Subject sub= subjectRepository.findById(subjectId).get();
-           sub.setFClassAvg(Math.round(classAvg/noOfStudent));
+           double val=classAvg/noOfStudent;
+
+           sub.setFClassAvg(Double.parseDouble(df.format(val)));
            subjectRepository.save(sub);
 
         }
@@ -57,7 +67,7 @@ public class ResultServiceImpl implements ResultService {
             if (sc2.getClassArm().getArmId().toString() == ArmId) {
                 totalPrimaryKey2.add(sc2.getStudentId());
                 totalValue2.add(sc2.getFTotal());
-                sc2.setFPercentage(Math.round(sc2.getFTotal()/sc2.getNoOfSubjectOffered()));
+                sc2.setFPercentage(Double.parseDouble(df.format(sc2.getFTotal()/sc2.getNoOfSubjectOffered())));
                studentRepository.save(sc2);
             }
         }
@@ -174,8 +184,82 @@ public class ResultServiceImpl implements ResultService {
 
     }
     @Override
-    public boolean gradeStudent(Scoresheet clientItemP){
+    public boolean gradeStudent(Scoresheet[] clientItemP){
         //Method to be implemented in the next commit
+
+        boolean returnValue = false;
+        Dictionary<Integer, Grade> lsg=new Hashtable<Integer, Grade>();
+        int i = 0;
+        int term = settingRepository.findById(1).get().getTerm();
+        Iterable<Grade> grades= gradeRepository.findAll();
+        Iterable<Scoresheet> scoresheets=scoresheetRepository.findAll();
+        for(Grade grade :grades)
+
+        {
+
+            while (i <=grade.getRangeHigh())
+            {
+                lsg.put(i, grade);
+                i++;
+            }
+
+        }
+        if (lsg.size() > 0) {
+            if (clientItemP == null) {
+                Scoresheet dr2;
+                if (term == 1) {
+
+                    for (Scoresheet scoresheet : scoresheets) {
+                        dr2 = scoresheetRepository.findById(scoresheet.getSheetId()).get();
+                        dr2.setFGrade(lsg.get(Integer.parseInt(Double.toString(scoresheet.getFTotal()))).getGradeName());
+                        dr2.setFRemark(lsg.get(Integer.parseInt(Double.toString(scoresheet.getFTotal()))).getRemark());
+                        scoresheetRepository.save(dr2);
+                    }
+
+                } else if (term == 2) {
+                    for (Scoresheet scoresheet : scoresheets) {
+                        dr2 = scoresheetRepository.findById(scoresheet.getSheetId()).get();
+                        dr2.setSGrade(lsg.get(Integer.parseInt(Double.toString(scoresheet.getSTotal()))).getGradeName());
+                        dr2.setSRemark(lsg.get(Integer.parseInt(Double.toString(scoresheet.getSTotal()))).getRemark());
+                        scoresheetRepository.save(dr2);
+                    }
+                } else {
+                    for (Scoresheet scoresheet : scoresheets) {
+                        dr2 = scoresheetRepository.findById(scoresheet.getSheetId()).get();
+                        dr2.setTGrade(lsg.get(Integer.parseInt(Double.toString(scoresheet.getTTotal()))).getGradeName());
+                        dr2.setTRemark(lsg.get(Integer.parseInt(Double.toString(scoresheet.getTTotal()))).getRemark());
+                        scoresheetRepository.save(dr2);
+                    }
+                }
+            } else {
+                Scoresheet dr2;
+                if (term == 1) {
+
+                    for (Scoresheet scoresheet : clientItemP) {
+                        dr2 = scoresheetRepository.findById(scoresheet.getSheetId()).get();
+                        dr2.setFGrade(lsg.get(Integer.parseInt(Double.toString(scoresheet.getFTotal()))).getGradeName());
+                        dr2.setFRemark(lsg.get(Integer.parseInt(Double.toString(scoresheet.getFTotal()))).getRemark());
+                        scoresheetRepository.save(dr2);
+                    }
+
+                } else if (term == 2) {
+                    for (Scoresheet scoresheet : clientItemP) {
+                        dr2 = scoresheetRepository.findById(scoresheet.getSheetId()).get();
+                        dr2.setSGrade(lsg.get(Integer.parseInt(Double.toString(scoresheet.getSTotal()))).getGradeName());
+                        dr2.setSRemark(lsg.get(Integer.parseInt(Double.toString(scoresheet.getSTotal()))).getRemark());
+                        scoresheetRepository.save(dr2);
+                    }
+                } else {
+                    for (Scoresheet scoresheet : clientItemP) {
+                        dr2 = scoresheetRepository.findById(scoresheet.getSheetId()).get();
+                        dr2.setTGrade(lsg.get(Integer.parseInt(Double.toString(scoresheet.getTTotal()))).getGradeName());
+                        dr2.setTRemark(lsg.get(Integer.parseInt(Double.toString(scoresheet.getTTotal()))).getRemark());
+                        scoresheetRepository.save(dr2);
+                    }
+                }
+            }
+        }
+
         return true;
     }
     @Override

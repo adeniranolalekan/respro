@@ -12,7 +12,7 @@ public interface ResultService {
      void updateSubjectPosition(ArrayList<Long> primaryKey, ArrayList<Double> value);
     int findMax(ArrayList<Double> inList);
     void updateStudentOfferedSubject(Object[] studentIds, boolean add);
-     boolean gradeStudent(Scoresheet clientItemP);
+     boolean gradeStudent(Scoresheet[] clientItemP);
      void UpdateCAs();
 
 }

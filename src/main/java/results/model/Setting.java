@@ -13,8 +13,8 @@ import javax.persistence.Id;
 public class Setting {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long settingId;
-    private Long Term;
+    private Integer settingId;
+    private Integer Term;
     @Type(type="org.hibernate.type.NumericBooleanType")
     private boolean resultApproved;
     private boolean currentSession;

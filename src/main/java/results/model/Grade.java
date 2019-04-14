@@ -12,9 +12,9 @@ import javax.persistence.Id;
 public class Grade {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long gradeId;
+    private Integer gradeId;
     private Long rangeLow;
     private  Long rangeHigh;
-    private Long gradeName;
+    private String gradeName;
     private String Remark;
 }
