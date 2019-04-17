@@ -1,11 +1,10 @@
 package results.model;
 
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @Entity
@@ -16,5 +15,8 @@ public class TComment {
     private Long rangeLow;
     private Long rangeHigh;
     private String comment;
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @JoinColumn(name = "armId",nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private  ClassArm classArm;
 }

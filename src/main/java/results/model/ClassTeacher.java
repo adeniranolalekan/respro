@@ -17,7 +17,7 @@ public class ClassTeacher {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "userId",nullable = false)
+    @JoinColumn(name = "armId",nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ClassArm classArm;
 
